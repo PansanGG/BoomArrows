@@ -1,0 +1,45 @@
+package pansangg.boomarrows;
+
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+
+public final class Main extends JavaPlugin implements @NotNull Listener {
+
+    @Override
+    public void onEnable() {
+        getServer().getPluginManager().registerEvents(this,this);
+    }
+
+    @Override
+    public void onDisable() {
+        // Plugin shutdown logic
+    }
+
+    @EventHandler
+    public void onArrow(ProjectileHitEvent e) {
+        Projectile arrow = e.getEntity();
+        Block block = e.getHitBlock();
+        Entity entity = e.getHitEntity();
+        if (arrow.getShooter() instanceof Player) {
+            Player shooter = (Player) arrow.getShooter();
+            ItemStack bow = shooter.getInventory().getItemInMainHand();
+            if (bow.getType().equals(Material.BOW) && bow.getItemMeta().getDisplayName().equals("Boom bow")) {
+                if (block != null) {
+                    block.getWorld().createExplosion(block.getLocation(), 5f, false, false);
+                } else if (entity != null) {
+                    entity.getWorld().createExplosion(entity.getLocation(), 5f, false, false);
+                }
+                arrow.remove();
+            }
+        }
+    }
+}
